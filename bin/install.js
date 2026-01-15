@@ -25,7 +25,8 @@ ${cyan}   ██████╗ ███████╗██████╗
 
   Get Shit Done ${dim}v${pkg.version}${reset}
   A meta-prompting, context engineering and spec-driven
-  development system for Gemini CLI by TÂCHES.
+  development system for Gemini CLI by /Cars10 which was
+  derived by the excellent work from TÂCHES.
 `;
 
 // Parse args
