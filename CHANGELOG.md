@@ -6,6 +6,95 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.5.15] - 2025-01-15
+
+### Fixed
+- **Agents now install correctly** — The `agents/` folder (gsd-executor, gsd-verifier, gsd-integration-checker, gsd-milestone-auditor) was missing from npm package, now included
+
+### Changed
+- Consolidated `/gsd:plan-fix` into `/gsd:plan-phase --gaps` for simpler workflow
+- UAT file writes now batched instead of per-response for better performance
+
+## [1.5.14] - 2025-01-15
+
+### Fixed
+- Plan-phase now always routes to `/gsd:execute-phase` after planning, even for single-plan phases
+
+## [1.5.13] - 2026-01-15
+
+### Fixed
+- `/gsd:new-milestone` now presents research and requirements paths as equal options, matching `/gsd:new-project` format
+
+## [1.5.12] - 2025-01-15
+
+### Changed
+- **Milestone cycle reworked for proper requirements flow:**
+  - `complete-milestone` now archives AND deletes ROADMAP.md and REQUIREMENTS.md (fresh for next milestone)
+  - `new-milestone` is now a "brownfield new-project" — updates PROJECT.md with new goals, routes to define-requirements
+  - `discuss-milestone` is now required before `new-milestone` (creates context file)
+  - `research-project` is milestone-aware — focuses on new features, ignores already-validated requirements
+  - `create-roadmap` continues phase numbering from previous milestone
+  - Flow: complete → discuss → new-milestone → research → requirements → roadmap
+
+### Fixed
+- `MILESTONE-AUDIT.md` now versioned as `v{version}-MILESTONE-AUDIT.md` and archived on completion
+- `progress` now correctly routes to `/gsd:discuss-milestone` when between milestones (Route F)
+
+## [1.5.11] - 2025-01-15
+
+### Changed
+- Verifier reuses previous must-haves on re-verification instead of re-deriving, focuses deep verification on failed items with quick regression checks on passed items
+
+## [1.5.10] - 2025-01-15
+
+### Changed
+- Milestone audit now reads existing phase VERIFICATION.md files instead of re-verifying each phase, aggregates tech debt and deferred gaps, adds `tech_debt` status for non-blocking accumulated debt
+
+### Fixed
+- VERIFICATION.md now included in phase completion commit alongside ROADMAP.md, STATE.md, and REQUIREMENTS.md
+
+## [1.5.9] - 2025-01-15
+
+### Added
+- Milestone audit system (`/gsd:audit-milestone`) for verifying milestone completion with parallel verification agents
+
+### Changed
+- Checkpoint display format improved with box headers and unmissable "→ YOUR ACTION:" prompts
+- Subagent colors updated (executor: yellow, integration-checker: blue)
+- Execute-phase now recommends `/gsd:audit-milestone` when milestone completes
+
+### Fixed
+- Research-phase no longer gatekeeps by domain type
+
+### Removed
+- Domain expertise feature (`~/.claude/skills/expertise/`) - was personal tooling not available to other users
+
+## [1.5.8] - 2025-01-15
+
+### Added
+- Verification loop: When gaps are found, verifier generates fix plans that execute automatically before re-verifying
+
+### Changed
+- `gsd-executor` subagent color changed from red to blue
+
+## [1.5.7] - 2025-01-15
+
+### Added
+- `gsd-executor` subagent: Dedicated agent for plan execution with full workflow logic built-in
+- `gsd-verifier` subagent: Goal-backward verification that checks if phase goals are actually achieved (not just tasks completed)
+- Phase verification: Automatic verification runs when a phase completes to catch stubs and incomplete implementations
+- Goal-backward planning reference: Documentation for deriving must-haves from goals
+
+### Changed
+- execute-plan and execute-phase now spawn `gsd-executor` subagent instead of using inline workflow
+- Roadmap and planning workflows enhanced with goal-backward analysis
+
+### Removed
+- Obsolete templates (`checkpoint-resume.md`, `subagent-task-prompt.md`) — logic now lives in subagents
+
+### Fixed
+- Updated remaining `general-purpose` subagent references to use `gsd-executor`
+
 ## [1.5.6] - 2025-01-15
 
 ### Changed
@@ -632,7 +721,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - YOLO mode for autonomous execution
 - Interactive mode with checkpoints
 
-[Unreleased]: https://github.com/glittercowboy/get-shit-done/compare/v1.5.6...HEAD
+[Unreleased]: https://github.com/glittercowboy/get-shit-done/compare/v1.5.15...HEAD
+[1.5.15]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.15
+[1.5.14]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.14
+[1.5.13]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.13
+[1.5.12]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.12
+[1.5.11]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.11
+[1.5.10]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.10
+[1.5.9]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.9
+[1.5.8]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.8
+[1.5.7]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.7
 [1.5.6]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.6
 [1.5.5]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.5
 [1.5.4]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.4

@@ -129,10 +129,45 @@ Ship your MVP in a day. Add features. Insert hotfixes. The system stays modular 
 - `/gsd:map-codebase` - Map existing codebase (brownfield)
 
 ### Execution
-- `/gsd:plan-phase [N]` - Generate task plans for phase
-- `/gsd:execute-phase <N>` - Execute plans in parallel
-- `/gsd:execute-plan` - Run single plan
-- `/gsd:progress` - Check status
+
+| Command | What it does |
+|---------|--------------|
+| `/gsd:plan-phase [N]` | Generate task plans for phase |
+| `/gsd:execute-phase <N>` | Execute all plans in phase with parallel agents |
+| `/gsd:execute-plan` | Run single plan via subagent |
+| `/gsd:progress` | Where am I? What's next? |
+
+### Verification
+
+| Command | What it does |
+|---------|--------------|
+| `/gsd:verify-work [N]` | User acceptance test of phase or plan ¹ |
+
+### Milestones
+
+| Command | What it does |
+|---------|--------------|
+| `/gsd:complete-milestone` | Ship it, prep next version |
+| `/gsd:discuss-milestone` | Gather context for next milestone |
+| `/gsd:new-milestone [name]` | Create new milestone with phases |
+
+### Phase Management
+
+| Command | What it does |
+|---------|--------------|
+| `/gsd:add-phase` | Append phase to roadmap |
+| `/gsd:insert-phase [N]` | Insert urgent work between phases |
+| `/gsd:remove-phase [N]` | Remove future phase, renumber subsequent |
+| `/gsd:discuss-phase [N]` | Gather context before planning |
+| `/gsd:research-phase [N]` | Deep research for unfamiliar domains |
+| `/gsd:list-phase-assumptions [N]` | See what Claude assumes before correcting |
+
+### Session
+
+| Command | What it does |
+|---------|--------------|
+| `/gsd:pause-work` | Create handoff file when stopping mid-phase |
+| `/gsd:resume-work` | Restore from last session |
 
 ### Utilities
 - `/gsd:add-todo [desc]` - Capture ideas

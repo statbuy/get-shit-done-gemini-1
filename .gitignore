@@ -3,6 +3,7 @@ package-lock.json
 .DS_Store
 TO-DOS.md
 .planning
-.gemini/
+/research.claude/
+
+# Local test installs
 .claude/
-test-output/

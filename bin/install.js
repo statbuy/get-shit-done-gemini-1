@@ -164,12 +164,12 @@ function install(isGlobal) {
   copyWithPathReplacement(skillSrc, skillDest, pathPrefix);
   console.log(`  ${green}✓${reset} Installed get-shit-done`);
 
-  // Copy rules with path replacement
-  const rulesSrc = path.join(src, 'rules');
-  const rulesDest = path.join(geminiDir, 'rules');
-  if (fs.existsSync(rulesSrc)) {
-    copyWithPathReplacement(rulesSrc, rulesDest, pathPrefix);
-    console.log(`  ${green}✓${reset} Installed rules`);
+  // Copy agents to ~/.claude/agents (subagents must be at root level)
+  const agentsSrc = path.join(src, 'agents');
+  if (fs.existsSync(agentsSrc)) {
+    const agentsDest = path.join(claudeDir, 'agents');
+    copyWithPathReplacement(agentsSrc, agentsDest, pathPrefix);
+    console.log(`  ${green}✓${reset} Installed agents`);
   }
 
   // Copy CHANGELOG.md

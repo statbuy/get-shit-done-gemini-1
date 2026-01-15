@@ -341,6 +341,104 @@ After all waves complete, aggregate results:
 ```
 </step>
 
+<step name="verify_phase_goal">
+Verify phase achieved its GOAL, not just completed its TASKS.
+
+**Spawn verifier:**
+
+```
+Task(
+  prompt="Verify phase {phase_number} goal achievement.
+
+Phase directory: {phase_dir}
+Phase goal: {goal from ROADMAP.md}
+
+Check must_haves against actual codebase. Create VERIFICATION.md.
+Verify what actually exists in the code.",
+  subagent_type="gsd-verifier"
+)
+```
+
+**Read verification status:**
+
+```bash
+grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
+```
+
+**Route by status:**
+
+| Status | Action |
+|--------|--------|
+| `passed` | Continue to update_roadmap |
+| `human_needed` | Present items to user, get approval or feedback |
+| `gaps_found` | Present gap summary, offer `/gsd:plan-phase {phase} --gaps` |
+
+**If passed:**
+
+Phase goal verified. Proceed to update_roadmap.
+
+**If human_needed:**
+
+```markdown
+## ✓ Phase {X}: {Name} — Human Verification Required
+
+All automated checks passed. {N} items need human testing:
+
+### Human Verification Checklist
+
+{Extract from VERIFICATION.md human_verification section}
+
+---
+
+**After testing:**
+- "approved" → continue to update_roadmap
+- Report issues → will route to gap closure planning
+```
+
+If user approves → continue to update_roadmap.
+If user reports issues → treat as gaps_found.
+
+**If gaps_found:**
+
+Present gaps and offer next command:
+
+```markdown
+## ⚠ Phase {X}: {Name} — Gaps Found
+
+**Score:** {N}/{M} must-haves verified
+**Report:** {phase_dir}/{phase}-VERIFICATION.md
+
+### What's Missing
+
+{Extract gap summaries from VERIFICATION.md gaps section}
+
+---
+
+## ▶ Next Up
+
+**Plan gap closure** — create additional plans to complete the phase
+
+`/gsd:plan-phase {X} --gaps`
+
+<sub>`/clear` first → fresh context window</sub>
+
+---
+
+**Also available:**
+- `cat {phase_dir}/{phase}-VERIFICATION.md` — see full report
+- `/gsd:verify-work {X}` — manual testing before planning
+```
+
+User runs `/gsd:plan-phase {X} --gaps` which:
+1. Reads VERIFICATION.md gaps
+2. Creates additional plans (04, 05, etc.) to close gaps
+3. User then runs `/gsd:execute-phase {X}` again
+4. Execute-phase runs incomplete plans (04-05)
+5. Verifier runs again after new plans complete
+
+User stays in control at each decision point.
+</step>
+
 <step name="update_roadmap">
 Update ROADMAP.md to reflect phase completion:
 
@@ -350,9 +448,10 @@ Update ROADMAP.md to reflect phase completion:
 # Update status
 ```
 
-Commit roadmap update:
+Commit phase completion (roadmap, state, verification):
 ```bash
-git add .planning/ROADMAP.md
+git add .planning/ROADMAP.md .planning/STATE.md .planning/phases/{phase_dir}/*-VERIFICATION.md
+git add .planning/REQUIREMENTS.md  # if updated
 git commit -m "docs(phase-{X}): complete phase execution"
 ```
 </step>
