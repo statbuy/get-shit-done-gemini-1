@@ -254,7 +254,7 @@ function install(isGlobal) {
   const settings = readSettings(settingsPath);
   const statuslineCommand = isGlobal
     ? '$HOM./.gemini/hooks/statusline.sh'
-    : '.gemini/hooks/statusline.sh';
+    : './.gemini/hooks/statusline.sh';
 
   return { settingsPath, settings, statuslineCommand };
 }
