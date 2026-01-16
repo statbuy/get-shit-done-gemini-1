@@ -6,7 +6,7 @@ const replacements = [
   { from: new RegExp('Claude Code', 'g'), to: 'Gemini CLI' },
   { from: new RegExp('Claude', 'g'), to: 'Gemini' },
   { from: new RegExp('claude-code', 'g'), to: 'gemini-cli' },
-  { from: new RegExp('~/\.claude/', 'g'), to: '~/.gemini/' },
+  { from: new RegExp('~/.claude/', 'g'), to: '~/.gemini/' },
   { from: new RegExp('\./\.claude/', 'g'), to: './.gemini/' },
   { from: new RegExp('\.claude/', 'g'), to: '.gemini/' },
   { from: new RegExp('CLAUDE_CONFIG_DIR', 'g'), to: 'GEMINI_CONFIG_DIR' },
@@ -78,7 +78,73 @@ function copyRecursiveSync(src, dest) {
   }
 }
 
-// 2. Content Replacement
+// 2. TOML Generation for GSD Commands
+function generateTomlConfigs() {
+  console.log('--- Generating TOML Configurations ---');
+  const commandsDir = path.join('commands', 'gsd');
+  
+  if (!fs.existsSync(commandsDir)) {
+    console.log('commands/gsd directory not found. Skipping TOML generation.');
+    return;
+  }
+
+  const files = fs.readdirSync(commandsDir);
+  
+  files.forEach(file => {
+    if (file.endsWith('.md')) {
+      const mdPath = path.join(commandsDir, file);
+      const tomlPath = path.join(commandsDir, file.replace('.md', '.toml'));
+      
+      try {
+        const content = fs.readFileSync(mdPath, 'utf8');
+        
+        // Parse Frontmatter using RegExp constructor to avoid syntax errors in file writing
+        // Matches: Start of file, ---, newlines, content (group 1), newlines, ---, newlines, rest (group 2)
+        const frontmatterRegex = new RegExp("^---\s*[\\r\\n]+([\\s\\S]*?)[\\r\\n]+---\s*[\\r\\n]+([\\s\\S]*)$");
+        const match = content.match(frontmatterRegex);
+        
+        if (match) {
+          const frontmatter = match[1];
+          const body = match[2].trim();
+          
+          // Extract description
+          const descMatch = frontmatter.match(new RegExp("description:\s*(.+)"));
+          let description = descMatch ? descMatch[1].trim() : "No description provided";
+          
+          // Clean quotes if present - Simplified logic
+          if (description.length >= 2) {
+             const first = description[0];
+             const last = description[description.length - 1];
+             if (first === last && (first === '"' || first === "'")) {
+                description = description.slice(1, -1);
+             }
+          }
+          
+          // Escape quotes for TOML
+          const safeDescription = description.replace(/"/g, '\\"');
+          
+          // Escape triple quotes in body to avoid breaking the TOML multiline string
+          const safeBody = body.replace(/"""/g, '\\"\\\"\\"');
+          
+          const tomlContent = `description = "${safeDescription}"\n\nprompt = """
+${safeBody}
+"""
+`;
+          
+          fs.writeFileSync(tomlPath, tomlContent);
+          // console.log(`Generated: ${tomlPath}`); // reduce noise
+        } else {
+            console.log(`Skipping ${file}: Invalid frontmatter format`);
+        }
+      } catch (err) {
+        console.error(`Error processing ${file}: ${err.message}`);
+      }
+    }
+  });
+  console.log(`Checked/Generated TOML configs in ${commandsDir}`);
+}
+
+// 3. Content Replacement
 function processFile(filePath) {
   try {
     let content = fs.readFileSync(filePath, 'utf8');
@@ -105,7 +171,7 @@ function processFile(filePath) {
   "  if (fs.existsSync(rulesSrc)) {\n" +
   "    copyWithPathReplacement(rulesSrc, rulesDest, pathPrefix);\n" +
   "    console.log(`  ${green}✓${reset} Installed rules`);\n" +
-  "  }\n\n" +
+  "  }\n\n" + 
   "  // Copy CHANGELOG.md";
   
         content = content.replace('// Copy CHANGELOG.md', rulesInstallBlock);
@@ -131,14 +197,15 @@ function walk(dir) {
       }
     } else if (entry.isFile()) {
        // Filter for text-based files we want to edit
-       if (/\.(md|js|json|toml|txt|svg)$/.test(entry.name) && !entry.name.includes('gemini-convert.js')) {
+       // Using RegExp constructor for safety
+       if (new RegExp("\\.(md|js|json|toml|txt|svg)$").test(entry.name) && !entry.name.includes('gemini-convert.js')) {
          processFile(fullPath);
        }
     }
   }
 }
 
-// 3. Package.json Updates
+// 4. Package.json Updates
 function updatePackageJson() {
   const pkgPath = 'package.json';
   if (fs.existsSync(pkgPath)) {
@@ -170,6 +237,7 @@ function updatePackageJson() {
 // Main Execution
 console.log('Starting Gemini Conversion...');
 normalizeStructure();
+generateTomlConfigs();
 updatePackageJson();
 walk('.');
 console.log('Conversion Complete.');
