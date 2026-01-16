@@ -6,6 +6,53 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.5.20] - 2026-01-16
+
+### Fixed
+- Research no longer skipped based on premature "Research: Unlikely" predictions made during roadmap creation. The `--skip-research` flag provides explicit control when needed.
+
+### Removed
+- `Research: Likely/Unlikely` fields from roadmap phase template
+- `detect_research_needs` step from roadmap creation workflow
+- Roadmap-based research skip logic from planner agent
+
+## [1.5.19] - 2026-01-16
+
+### Changed
+- `/gsd:discuss-phase` redesigned with intelligent gray area analysis — analyzes phase to identify discussable areas (UI, UX, Behavior, etc.), presents multi-select for user control, deep-dives each area with focused questioning
+- Explicit scope guardrail prevents scope creep during discussion — captures deferred ideas without acting on them
+- CONTEXT.md template restructured for decisions (domain boundary, decisions by category, Claude's discretion, deferred ideas)
+- Downstream awareness: discuss-phase now explicitly documents that CONTEXT.md feeds researcher and planner agents
+- `/gsd:plan-phase` now integrates research — spawns `gsd-phase-researcher` before planning unless research exists or `--skip-research` flag used
+
+## [1.5.18] - 2026-01-16
+
+### Added
+- **Plan verification loop** — Plans are now verified before execution with a planner → checker → revise cycle
+  - New `gsd-plan-checker` agent (744 lines) validates plans will achieve phase goals
+  - Six verification dimensions: requirement coverage, task completeness, dependency correctness, key links, scope sanity, must_haves derivation
+  - Max 3 revision iterations before user escalation
+  - `--skip-verify` flag for experienced users who want to bypass verification
+- **Dedicated planner agent** — `gsd-planner` (1,319 lines) consolidates all planning expertise
+  - Complete methodology: discovery levels, task breakdown, dependency graphs, scope estimation, goal-backward analysis
+  - Revision mode for handling checker feedback
+  - TDD integration and checkpoint patterns
+- **Statusline integration** — Context usage, model, and current task display
+
+### Changed
+- `/gsd:plan-phase` refactored to thin orchestrator pattern (310 lines)
+  - Spawns `gsd-planner` for planning, `gsd-plan-checker` for verification
+  - User sees status between agent spawns (not a black box)
+- Planning references deprecated with redirects to `gsd-planner` agent sections
+  - `plan-format.md`, `scope-estimation.md`, `goal-backward.md`, `principles.md`
+  - `workflows/plan-phase.md`
+
+### Fixed
+- Removed zombie `gsd-milestone-auditor` agent (was accidentally re-added after correct deletion)
+
+### Removed
+- Phase 99 throwaway test files
+
 ## [1.5.17] - 2026-01-15
 
 ### Added
@@ -748,7 +795,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - YOLO mode for autonomous execution
 - Interactive mode with checkpoints
 
-[Unreleased]: https://github.com/glittercowboy/get-shit-done/compare/v1.5.17...HEAD
+[Unreleased]: https://github.com/glittercowboy/get-shit-done/compare/v1.5.20...HEAD
+[1.5.20]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.20
+[1.5.19]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.19
+[1.5.18]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.18
 [1.5.17]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.17
 [1.5.16]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.16
 [1.5.15]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.15

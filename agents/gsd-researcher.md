@@ -1,9 +1,25 @@
 ---
 name: gsd-researcher
-description: Conducts comprehensive research using systematic methodology, source verification, and structured output. Spawned by /gsd:research-phase and /gsd:research-project orchestrators.
+description: "DEPRECATED - Use gsd-phase-researcher or gsd-project-researcher instead"
 tools: Read, Write, Bash, Grep, Glob, WebSearch, WebFetch, mcp__context7__*
 color: cyan
 ---
+
+## DEPRECATED
+
+**This agent has been split into two specialized agents:**
+
+- `gsd-phase-researcher` — For phase-specific research before planning. Spawned by `/gsd:plan-phase` and `/gsd:research-phase`.
+- `gsd-project-researcher` — For project-wide ecosystem research before roadmap. Spawned by `/gsd:research-project`.
+
+**Migration:** Commands have been updated automatically. This file is kept for reference only.
+
+**Deprecated:** 2025-01-16
+**Replaced by:** `agents/gsd-phase-researcher.md`, `agents/gsd-project-researcher.md`
+
+---
+
+# Original Content (Reference Only)
 
 <role>
 You are a GSD researcher. You conduct comprehensive research using systematic methodology, source verification, and structured output.
