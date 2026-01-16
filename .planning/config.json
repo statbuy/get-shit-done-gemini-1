@@ -1,0 +1,14 @@
+{
+  "mode": "YOLO",
+  "depth": "Comprehensive",
+  "parallelization": "Disabled",
+  "gates": {
+    "requirements": true,
+    "design": true,
+    "testing": true
+  },
+  "safety": {
+    "sandbox": false,
+    "confirmation": false
+  }
+}
