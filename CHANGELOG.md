@@ -6,6 +6,129 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.6.3] - 2025-01-17
+
+### Added
+- `--gaps-only` flag for `/gsd:execute-phase` — executes only gap closure plans after verify-work finds issues, eliminating redundant state discovery
+
+## [1.6.2] - 2025-01-17
+
+### Changed
+- README restructured with clearer 6-step workflow: init → discuss → plan → execute → verify → complete
+- Discuss-phase and verify-work now emphasized as critical steps in core workflow documentation
+- "Subagent Execution" section replaced with "Multi-Agent Orchestration" explaining thin orchestrator pattern and 30-40% context efficiency
+- Brownfield instructions consolidated into callout at top of "How It Works" instead of separate section
+- Phase directories now created at discuss/plan-phase instead of during roadmap creation
+
+## [1.6.1] - 2025-01-17
+
+### Changed
+- Installer performs clean install of GSD folders, removing orphaned files from previous versions
+- `/gsd:update` shows changelog and asks for confirmation before updating, with clear warning about what gets replaced
+
+## [1.6.0] - 2026-01-17
+
+### Changed
+- **BREAKING:** Unified `/gsd:new-milestone` flow — now mirrors `/gsd:new-project` with questioning → research → requirements → roadmap in a single command
+- Roadmapper agent now references templates instead of inline structures for easier maintenance
+
+### Removed
+- **BREAKING:** `/gsd:discuss-milestone` — consolidated into `/gsd:new-milestone`
+- **BREAKING:** `/gsd:create-roadmap` — integrated into project/milestone flows
+- **BREAKING:** `/gsd:define-requirements` — integrated into project/milestone flows
+- **BREAKING:** `/gsd:research-project` — integrated into project/milestone flows
+
+### Added
+- `/gsd:verify-work` now includes next-step routing after verification completes
+
+## [1.5.30] - 2026-01-17
+
+### Fixed
+- Output templates in `plan-phase`, `execute-phase`, and `audit-milestone` now render markdown correctly instead of showing literal backticks
+- Next-step suggestions now consistently recommend `/gsd:discuss-phase` before `/gsd:plan-phase` across all routing paths
+
+## [1.5.29] - 2025-01-16
+
+### Changed
+- Discuss-phase now uses domain-aware questioning with deeper probing for gray areas
+
+### Fixed
+- Windows hooks now work via Node.js conversion (statusline, update-check)
+- Phase input normalization at command entry points
+- Removed blocking notification popups (gsd-notify) on all platforms
+
+## [1.5.28] - 2026-01-16
+
+### Changed
+- Consolidated milestone workflow into single command
+- Merged domain expertise skills into agent configurations
+- **BREAKING:** Removed `/gsd:execute-plan` command (use `/gsd:execute-phase` instead)
+
+### Fixed
+- Phase directory matching now handles both zero-padded (05-*) and unpadded (5-*) folder names
+- Map-codebase agent output collection
+
+## [1.5.27] - 2026-01-16
+
+### Fixed
+- Orchestrator corrections between executor completions are now committed (previously left uncommitted when orchestrator made small fixes between waves)
+
+## [1.5.26] - 2026-01-16
+
+### Fixed
+- Revised plans now get committed after checker feedback (previously only initial plans were committed, leaving revisions uncommitted)
+
+## [1.5.25] - 2026-01-16
+
+### Fixed
+- Stop notification hook no longer shows stale project state (now uses session-scoped todos only)
+- Researcher agent now reliably loads CONTEXT.md from discuss-phase
+
+## [1.5.24] - 2026-01-16
+
+### Fixed
+- Stop notification hook now correctly parses STATE.md fields (was always showing "Ready for input")
+- Planner agent now reliably loads CONTEXT.md and RESEARCH.md files
+
+## [1.5.23] - 2025-01-16
+
+### Added
+- Cross-platform completion notification hook (Mac/Linux/Windows alerts when Claude stops)
+- Phase researcher now loads CONTEXT.md from discuss-phase to focus research on user decisions
+
+### Fixed
+- Consistent zero-padding for phase directories (01-name, not 1-name)
+- Plan file naming: `{phase}-{plan}-PLAN.md` pattern restored across all agents
+- Double-path bug in researcher git add command
+- Removed `/gsd:research-phase` from next-step suggestions (use `/gsd:plan-phase` instead)
+
+## [1.5.22] - 2025-01-16
+
+### Added
+- Statusline update indicator — shows `⬆ /gsd:update` when a new version is available
+
+### Fixed
+- Planner now updates ROADMAP.md placeholders after planning completes
+
+## [1.5.21] - 2026-01-16
+
+### Added
+- GSD brand system for consistent UI (checkpoint boxes, stage banners, status symbols)
+- Research synthesizer agent that consolidates parallel research into SUMMARY.md
+
+### Changed
+- **Unified `/gsd:new-project` flow** — Single command now handles questions → research → requirements → roadmap (~10 min)
+- Simplified README to reflect streamlined workflow: new-project → plan-phase → execute-phase
+- Added optional `/gsd:discuss-phase` documentation for UI/UX/behavior decisions before planning
+
+### Fixed
+- verify-work now shows clear checkpoint box with action prompt ("Type 'pass' or describe what's wrong")
+- Planner uses correct `{phase}-{plan}-PLAN.md` naming convention
+- Planner no longer surfaces internal `user_setup` in output
+- Research synthesizer commits all research files together (not individually)
+- Project researcher agent can no longer commit (orchestrator handles commits)
+- Roadmap requires explicit user approval before committing
+
 ## [1.5.20] - 2026-01-16
 
 ### Fixed
@@ -795,7 +918,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - YOLO mode for autonomous execution
 - Interactive mode with checkpoints
 
-[Unreleased]: https://github.com/glittercowboy/get-shit-done/compare/v1.5.20...HEAD
+[Unreleased]: https://github.com/glittercowboy/get-shit-done/compare/v1.6.3...HEAD
+[1.6.3]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.3
+[1.6.2]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.2
+[1.6.1]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.1
+[1.6.0]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.6.0
+[1.5.30]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.30
+[1.5.29]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.29
+[1.5.28]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.28
+[1.5.27]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.27
+[1.5.26]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.26
+[1.5.25]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.25
+[1.5.24]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.24
+[1.5.23]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.23
+[1.5.22]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.22
+[1.5.21]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.21
 [1.5.20]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.20
 [1.5.19]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.19
 [1.5.18]: https://github.com/glittercowboy/get-shit-done/releases/tag/v1.5.18

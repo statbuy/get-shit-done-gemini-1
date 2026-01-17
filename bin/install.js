@@ -124,8 +124,13 @@ function writeSettings(settingsPath, settings) {
 
 /**
  * Recursively copy directory, replacing paths in .md files
+ * Deletes existing destDir first to remove orphaned files from previous versions
  */
 function copyWithPathReplacement(srcDir, destDir, pathPrefix) {
+  // Clean install: remove existing destination to prevent orphaned files
+  if (fs.existsSync(destDir)) {
+    fs.rmSync(destDir, { recursive: true });
+  }
   fs.mkdirSync(destDir, { recursive: true });
 
   const entries = fs.readdirSync(srcDir, { withFileTypes: true });
@@ -201,11 +206,31 @@ function install(isGlobal) {
   copyWithPathReplacement(skillSrc, skillDest, pathPrefix);
   console.log(`  ${green}✓${reset} Installed get-shit-done`);
 
-  // Copy agents to ~/.gemini/agents (subagents must be at root level)
+  // Copy agents to ~/.claude/agents (subagents must be at root level)
+  // Only delete gsd-*.md files to preserve user's custom agents
   const agentsSrc = path.join(src, 'agents');
   if (fs.existsSync(agentsSrc)) {
-    const agentsDest = path.join(geminiDir, 'agents');
-    copyWithPathReplacement(agentsSrc, agentsDest, pathPrefix);
+    const agentsDest = path.join(claudeDir, 'agents');
+    fs.mkdirSync(agentsDest, { recursive: true });
+
+    // Remove old GSD agents (gsd-*.md) before copying new ones
+    if (fs.existsSync(agentsDest)) {
+      for (const file of fs.readdirSync(agentsDest)) {
+        if (file.startsWith('gsd-') && file.endsWith('.md')) {
+          fs.unlinkSync(path.join(agentsDest, file));
+        }
+      }
+    }
+
+    // Copy new agents (don't use copyWithPathReplacement which would wipe the folder)
+    const agentEntries = fs.readdirSync(agentsSrc, { withFileTypes: true });
+    for (const entry of agentEntries) {
+      if (entry.isFile() && entry.name.endsWith('.md')) {
+        let content = fs.readFileSync(path.join(agentsSrc, entry.name), 'utf8');
+        content = content.replace(/~\/\.claude\//g, pathPrefix);
+        fs.writeFileSync(path.join(agentsDest, entry.name), content);
+      }
+    }
     console.log(`  ${green}✓${reset} Installed agents`);
   }
 
@@ -241,36 +266,62 @@ function install(isGlobal) {
       const srcFile = path.join(hooksSrc, entry);
       const destFile = path.join(hooksDest, entry);
       fs.copyFileSync(srcFile, destFile);
-      // Make shell scripts executable
-      if (entry.endsWith('.sh')) {
-        fs.chmodSync(destFile, 0o755);
-      }
     }
     console.log(`  ${green}✓${reset} Installed hooks`);
   }
 
-  // Configure statusline in settings.json
-  const settingsPath = path.join(geminiDir, 'settings.json');
+  // Configure statusline and hooks in settings.json
+  const settingsPath = path.join(claudeDir, 'settings.json');
   const settings = readSettings(settingsPath);
   const statuslineCommand = isGlobal
-    ? '$HOM./.gemini/hooks/statusline.sh'
-    : './.gemini/hooks/statusline.sh';
+    ? 'node "$HOME/.claude/hooks/statusline.js"'
+    : 'node .claude/hooks/statusline.js';
+  const updateCheckCommand = isGlobal
+    ? 'node "$HOME/.claude/hooks/gsd-check-update.js"'
+    : 'node .claude/hooks/gsd-check-update.js';
+
+  // Configure SessionStart hook for update checking
+  if (!settings.hooks) {
+    settings.hooks = {};
+  }
+  if (!settings.hooks.SessionStart) {
+    settings.hooks.SessionStart = [];
+  }
+
+  // Check if GSD update hook already exists
+  const hasGsdUpdateHook = settings.hooks.SessionStart.some(entry =>
+    entry.hooks && entry.hooks.some(h => h.command && h.command.includes('gsd-check-update'))
+  );
+
+  if (!hasGsdUpdateHook) {
+    settings.hooks.SessionStart.push({
+      hooks: [
+        {
+          type: 'command',
+          command: updateCheckCommand
+        }
+      ]
+    });
+    console.log(`  ${green}✓${reset} Configured update check hook`);
+  }
 
   return { settingsPath, settings, statuslineCommand };
 }
 
 /**
- * Apply statusline config and print completion message
+ * Apply statusline config, then print completion message
  */
-function finishInstall(settingsPath, settings, statuslineCommand, shouldInstall) {
-  if (shouldInstall) {
+function finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline) {
+  if (shouldInstallStatusline) {
     settings.statusLine = {
       type: 'command',
       command: statuslineCommand
     };
-    writeSettings(settingsPath, settings);
     console.log(`  ${green}✓${reset} Configured statusline`);
   }
+
+  // Always write settings (hooks were already configured in install())
+  writeSettings(settingsPath, settings);
 
   console.log(`
   ${green}Done!${reset} Launch Gemini CLI and run ${cyan}/gsd:help${reset}.
@@ -280,7 +331,7 @@ function finishInstall(settingsPath, settings, statuslineCommand, shouldInstall)
 /**
  * Handle statusline configuration with optional prompt
  */
-function handleStatusline(settingsPath, settings, statuslineCommand, isInteractive, callback) {
+function handleStatusline(settings, isInteractive, callback) {
   const hasExisting = settings.statusLine != null;
 
   // No existing statusline - just install it
@@ -357,9 +408,9 @@ function promptLocation() {
     const choice = answer.trim() || '1';
     const isGlobal = choice !== '2';
     const { settingsPath, settings, statuslineCommand } = install(isGlobal);
-    // Interactive mode - prompt for statusline if needed
-    handleStatusline(settingsPath, settings, statuslineCommand, true, (shouldInstall) => {
-      finishInstall(settingsPath, settings, statuslineCommand, shouldInstall);
+    // Interactive mode - prompt for optional features
+    handleStatusline(settings, true, (shouldInstallStatusline) => {
+      finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline);
     });
   });
 }
@@ -373,15 +424,15 @@ if (hasGlobal && hasLocal) {
   process.exit(1);
 } else if (hasGlobal) {
   const { settingsPath, settings, statuslineCommand } = install(true);
-  // Non-interactive - skip prompt, respect --force-statusline
-  handleStatusline(settingsPath, settings, statuslineCommand, false, (shouldInstall) => {
-    finishInstall(settingsPath, settings, statuslineCommand, shouldInstall);
+  // Non-interactive - respect flags
+  handleStatusline(settings, false, (shouldInstallStatusline) => {
+    finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline);
   });
 } else if (hasLocal) {
   const { settingsPath, settings, statuslineCommand } = install(false);
-  // Non-interactive - skip prompt, respect --force-statusline
-  handleStatusline(settingsPath, settings, statuslineCommand, false, (shouldInstall) => {
-    finishInstall(settingsPath, settings, statuslineCommand, shouldInstall);
+  // Non-interactive - respect flags
+  handleStatusline(settings, false, (shouldInstallStatusline) => {
+    finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline);
   });
 } else {
   promptLocation();

@@ -13,6 +13,10 @@ allowed-tools:
   - WebFetch
 ---
 
+<execution_context>
+@~/.claude/get-shit-done/references/ui-brand.md
+</execution_context>
+
 <objective>
 Create executable phase prompts (PLAN.md files) for a roadmap phase with integrated research and verification.
 
@@ -32,13 +36,7 @@ Phase number: $ARGUMENTS (optional - auto-detects next unplanned phase if not pr
 - `--gaps` — Gap closure mode (reads VERIFICATION.md, skips research)
 - `--skip-verify` — Skip planner → checker verification loop
 
-Check for existing research and plans:
-
-```bash
-ls .planning/phases/${PHASE}-*/*-RESEARCH.md 2>/dev/null
-ls .planning/phases/${PHASE}-*/*-PLAN.md 2>/dev/null
-```
-
+Normalize phase input in step 2 before any directory lookups.
 </context>
 
 <process>
@@ -51,7 +49,7 @@ ls .planning/ 2>/dev/null
 
 **If not found:** Error - user should run `/gsd:new-project` first.
 
-## 2. Parse Arguments
+## 2. Parse and Normalize Arguments
 
 Extract from $ARGUMENTS:
 
@@ -62,6 +60,24 @@ Extract from $ARGUMENTS:
 - `--skip-verify` flag to bypass verification loop
 
 **If no phase number:** Detect next unplanned phase from roadmap.
+
+**Normalize phase to zero-padded format:**
+
+```bash
+# Normalize phase number (8 → 08, but preserve decimals like 2.1 → 02.1)
+if [[ "$PHASE" =~ ^[0-9]+$ ]]; then
+  PHASE=$(printf "%02d" "$PHASE")
+elif [[ "$PHASE" =~ ^([0-9]+)\.([0-9]+)$ ]]; then
+  PHASE=$(printf "%02d.%s" "${BASH_REMATCH[1]}" "${BASH_REMATCH[2]}")
+fi
+```
+
+**Check for existing research and plans:**
+
+```bash
+ls .planning/phases/${PHASE}-*/*-RESEARCH.md 2>/dev/null
+ls .planning/phases/${PHASE}-*/*-PLAN.md 2>/dev/null
+```
 
 ## 3. Validate Phase
 
@@ -74,6 +90,7 @@ grep -A5 "Phase ${PHASE}:" .planning/ROADMAP.md 2>/dev/null
 ## 4. Ensure Phase Directory Exists
 
 ```bash
+# PHASE is already normalized (08, 02.1, etc.) from step 2
 PHASE_DIR=$(ls -d .planning/phases/${PHASE}-* 2>/dev/null | head -1)
 if [ -z "$PHASE_DIR" ]; then
   # Create phase directory from roadmap name
@@ -102,8 +119,17 @@ ls "${PHASE_DIR}"/*-RESEARCH.md 2>/dev/null
 - Skip to step 6
 
 **If RESEARCH.md missing OR `--research` flag set:**
-- Display: `Phase {X}: {Name} — researching domain...`
-- Proceed to spawn researcher
+
+Display stage banner:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► RESEARCHING PHASE {X}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+◆ Spawning researcher...
+```
+
+Proceed to spawn researcher
 
 ### Spawn gsd-phase-researcher
 
@@ -197,7 +223,14 @@ UAT="${PHASE_DIR}/${PHASE}-UAT.md"
 
 ## 8. Spawn gsd-planner Agent
 
-Display: `Phase {X}: {Name} — launching planner...`
+Display stage banner:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► PLANNING PHASE {X}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+◆ Spawning planner...
+```
 
 Fill prompt and spawn:
 
@@ -229,7 +262,7 @@ Fill prompt and spawn:
 </planning_context>
 
 <downstream_consumer>
-Output consumed by /gsd:execute-phase or /gsd:execute-plan
+Output consumed by /gsd:execute-phase
 Plans must be executable prompts with:
 
 - Frontmatter (wave, depends_on, files_modified, autonomous)
@@ -277,7 +310,14 @@ Parse planner output:
 
 ## 10. Spawn gsd-plan-checker Agent
 
-Display: `Launching plan checker...`
+Display:
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► VERIFYING PLANS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+◆ Spawning plan checker...
+```
 
 Fill checker prompt and spawn:
 
@@ -378,33 +418,45 @@ Wait for user response.
 
 ## 13. Present Final Status
 
-```markdown
-Phase {X} planned: {N} plan(s) in {M} wave(s)
-
-## Research
-{Completed | Used existing | Skipped (--skip-research) | N/A (--gaps)}
-
-## Wave Structure
-Wave 1 (parallel): {plan-01}, {plan-02}
-Wave 2: {plan-03}
-
-## Verification
-{Passed | Passed with user override | Skipped (--skip-verify)}
-
----
-
-## Next Up
-
-**Phase {X}: [Phase Name]** - {N} plan(s)
-
-`/gsd:execute-phase {X}`
-
-<sub>`/clear` first - fresh context window</sub>
-
----
-```
+Route to `<offer_next>`.
 
 </process>
+
+<offer_next>
+Output this markdown directly (not as a code block):
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GSD ► PHASE {X} PLANNED ✓
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**Phase {X}: {Name}** — {N} plan(s) in {M} wave(s)
+
+| Wave | Plans | What it builds |
+|------|-------|----------------|
+| 1    | 01, 02 | [objectives] |
+| 2    | 03     | [objective]  |
+
+Research: {Completed | Used existing | Skipped}
+Verification: {Passed | Passed with override | Skipped}
+
+───────────────────────────────────────────────────────────────
+
+## ▶ Next Up
+
+**Execute Phase {X}** — run all {N} plans
+
+/gsd:execute-phase {X}
+
+<sub>/clear first → fresh context window</sub>
+
+───────────────────────────────────────────────────────────────
+
+**Also available:**
+- cat .planning/phases/{phase-dir}/*-PLAN.md — review plans
+- /gsd:plan-phase {X} --research — re-research first
+
+───────────────────────────────────────────────────────────────
+</offer_next>
 
 <success_criteria>
 - [ ] .planning/ directory validated

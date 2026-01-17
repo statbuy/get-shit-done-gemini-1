@@ -19,9 +19,8 @@ Then verify each level against the actual codebase.
 
 <required_reading>
 **Load these references:**
-- ~/.gemini/get-shit-done/references/goal-backward.md (derivation process)
-- ~/.gemini/get-shit-done/references/verification-patterns.md (detection patterns)
-- ~/.gemini/get-shit-done/templates/verification-report.md (output format)
+- ~/.claude/get-shit-done/references/verification-patterns.md (detection patterns)
+- ~/.claude/get-shit-done/templates/verification-report.md (output format)
 </required_reading>
 
 <process>
@@ -30,8 +29,9 @@ Then verify each level against the actual codebase.
 **Gather all verification context:**
 
 ```bash
-# Phase directory
-PHASE_DIR=$(ls -d .planning/phases/${PHASE_ARG}* 2>/dev/null | head -1)
+# Phase directory (match both zero-padded and unpadded)
+PADDED_PHASE=$(printf "%02d" ${PHASE_ARG} 2>/dev/null || echo "${PHASE_ARG}")
+PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE_ARG}-* 2>/dev/null | head -1)
 
 # Phase goal from ROADMAP
 grep -A 5 "Phase ${PHASE_NUM}" .planning/ROADMAP.md
@@ -97,7 +97,7 @@ If no must_haves in frontmatter, derive using goal-backward process:
 
 5. **Document derived must-haves** before proceeding to verification.
 
-See ~/.gemini/get-shit-done/references/goal-backward.md for detailed derivation guidance.
+<!-- Goal-backward derivation expertise is baked into the gsd-verifier agent -->
 </step>
 
 <step name="verify_truths">

@@ -154,7 +154,7 @@ Read its `<objective>` section.
 
 **{phase}-{plan}: [Plan Name]** — [objective summary from PLAN.md]
 
-`/gsd:execute-plan [full-path-to-PLAN.md]`
+`/gsd:execute-phase {phase}`
 
 <sub>`/clear` first → fresh context window</sub>
 
@@ -193,16 +193,15 @@ Check if `{phase}-CONTEXT.md` exists in phase directory.
 
 **Phase {N}: {Name}** — {Goal from ROADMAP.md}
 
-`/gsd:plan-phase {phase}`
+`/gsd:discuss-phase {phase}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
-- `/gsd:discuss-phase {phase}` — gather context first
-- `/gsd:research-phase {phase}` — investigate unknowns
-- `/gsd:list-phase-assumptions {phase}` — see Gemini's assumptions
+- `/gsd:plan-phase {phase}` — skip discussion, plan directly
+- `/gsd:list-phase-assumptions {phase}` — see Claude's assumptions
 
 ---
 ```
@@ -227,7 +226,7 @@ UAT.md exists with gaps (diagnosed issues). User needs to plan fixes.
 ---
 
 **Also available:**
-- `/gsd:execute-plan [path]` — continue with other work first
+- `/gsd:execute-phase {phase}` — execute phase plans
 - `/gsd:verify-work {phase}` — run more UAT testing
 
 ---
@@ -267,16 +266,15 @@ Read ROADMAP.md to get the next phase's name and goal.
 
 **Phase {Z+1}: {Name}** — {Goal from ROADMAP.md}
 
-`/gsd:plan-phase {Z+1}`
+`/gsd:discuss-phase {Z+1}` — gather context and clarify approach
 
 <sub>`/clear` first → fresh context window</sub>
 
 ---
 
 **Also available:**
+- `/gsd:plan-phase {Z+1}` — skip discussion, plan directly
 - `/gsd:verify-work {Z}` — user acceptance test before continuing
-- `/gsd:discuss-phase {Z+1}` — gather context first
-- `/gsd:research-phase {Z+1}` — investigate unknowns
 
 ---
 ```
@@ -325,20 +323,11 @@ Ready to plan the next milestone.
 
 ## ▶ Next Up
 
-**Discuss Next Milestone** — figure out what to build next
+**Start Next Milestone** — questioning → research → requirements → roadmap
 
-`/gsd:discuss-milestone`
+`/gsd:new-milestone`
 
 <sub>`/clear` first → fresh context window</sub>
-
----
-
-**Next milestone flow:**
-1. `/gsd:discuss-milestone` — thinking partner, creates context file
-2. `/gsd:new-milestone` — update PROJECT.md with new goals
-3. `/gsd:research-project` — (optional) research ecosystem
-4. `/gsd:define-requirements` — scope what to build
-5. `/gsd:create-roadmap` — plan how to build it
 
 ---
 ```
@@ -361,7 +350,7 @@ Ready to plan the next milestone.
 - [ ] Rich context provided (recent work, decisions, issues)
 - [ ] Current position clear with visual progress
 - [ ] What's next clearly explained
-- [ ] Smart routing: /gsd:execute-plan if plan exists, /gsd:plan-phase if not
+- [ ] Smart routing: /gsd:execute-phase if plans exist, /gsd:plan-phase if not
 - [ ] User confirms before any action
 - [ ] Seamless handoff to appropriate gsd command
       </success_criteria>

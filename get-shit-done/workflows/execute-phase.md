@@ -39,7 +39,9 @@ Options:
 Confirm phase exists and has plans:
 
 ```bash
-PHASE_DIR=$(ls -d .planning/phases/${PHASE_ARG}* 2>/dev/null | head -1)
+# Match both zero-padded (05-*) and unpadded (5-*) folders
+PADDED_PHASE=$(printf "%02d" ${PHASE_ARG} 2>/dev/null || echo "${PHASE_ARG}")
+PHASE_DIR=$(ls -d .planning/phases/${PADDED_PHASE}-* .planning/phases/${PHASE_ARG}-* 2>/dev/null | head -1)
 if [ -z "$PHASE_DIR" ]; then
   echo "ERROR: No phase directory matching '${PHASE_ARG}'"
   exit 1
@@ -69,15 +71,21 @@ ls -1 "$PHASE_DIR"/*-SUMMARY.md 2>/dev/null | sort
 For each plan, read frontmatter to extract:
 - `wave: N` - Execution wave (pre-computed)
 - `autonomous: true/false` - Whether plan has checkpoints
+- `gap_closure: true/false` - Whether plan closes gaps from verification/UAT
 
 Build plan inventory:
 - Plan path
 - Plan ID (e.g., "03-01")
 - Wave number
 - Autonomous flag
+- Gap closure flag
 - Completion status (SUMMARY exists = complete)
 
-Skip completed plans. If all complete, report "Phase already executed" and exit.
+**Filtering:**
+- Skip completed plans (have SUMMARY.md)
+- If `--gaps-only` flag: also skip plans where `gap_closure` is not `true`
+
+If all plans filtered out, report "No matching incomplete plans" and exit.
 </step>
 
 <step name="group_by_wave">
@@ -431,9 +439,9 @@ Present gaps and offer next command:
 
 User runs `/gsd:plan-phase {X} --gaps` which:
 1. Reads VERIFICATION.md gaps
-2. Creates additional plans (04, 05, etc.) to close gaps
-3. User then runs `/gsd:execute-phase {X}` again
-4. Execute-phase runs incomplete plans (04-05)
+2. Creates additional plans (04, 05, etc.) with `gap_closure: true` to close gaps
+3. User then runs `/gsd:execute-phase {X} --gaps-only`
+4. Execute-phase runs only gap closure plans (04-05)
 5. Verifier runs again after new plans complete
 
 User stays in control at each decision point.
