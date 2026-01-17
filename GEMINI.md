@@ -22,6 +22,8 @@ This script automates:
 
 Use this whenever you pull updates from the upstream repository.
 
+- **Sync History**: Successfully pulled latest from glittercowboy/get-shit-done (upstream/main), resolved merge conflicts by prioritizing upstream changes (while preserving .planning/ state), and re-applied Gemini branding via the conversion script on 2026-01-17.
+
 ## Slash Command Support
 
 The following GSD commands are available. When a command is invoked (e.g., `/gsd:help`), the corresponding definition file in `.gemini/commands/gsd/` should be read and followed as a system instruction.

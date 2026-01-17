@@ -93,7 +93,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.5.23] - 2025-01-16
 
 ### Added
-- Cross-platform completion notification hook (Mac/Linux/Windows alerts when Gemini stops)
+- Cross-platform completion notification hook (Mac/Linux/Windows alerts when Claude stops)
 - Phase researcher now loads CONTEXT.md from discuss-phase to focus research on user decisions
 
 ### Fixed
@@ -144,7 +144,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Changed
 - `/gsd:discuss-phase` redesigned with intelligent gray area analysis — analyzes phase to identify discussable areas (UI, UX, Behavior, etc.), presents multi-select for user control, deep-dives each area with focused questioning
 - Explicit scope guardrail prevents scope creep during discussion — captures deferred ideas without acting on them
-- CONTEXT.md template restructured for decisions (domain boundary, decisions by category, Gemini's discretion, deferred ideas)
+- CONTEXT.md template restructured for decisions (domain boundary, decisions by category, Claude's discretion, deferred ideas)
 - Downstream awareness: discuss-phase now explicitly documents that CONTEXT.md feeds researcher and planner agents
 - `/gsd:plan-phase` now integrates research — spawns `gsd-phase-researcher` before planning unless research exists or `--skip-research` flag used
 
@@ -179,7 +179,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.5.17] - 2026-01-15
 
 ### Added
-- New `/gsd:update` command — check for updates, install, and display changelog of what changed (better UX than raw `npx get-shit-done-gemini`)
+- New `/gsd:update` command — check for updates, install, and display changelog of what changed (better UX than raw `npx get-shit-done-cc`)
 
 ## [1.5.16] - 2026-01-15
 
@@ -264,7 +264,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Research-phase no longer gatekeeps by domain type
 
 ### Removed
-- Domain expertise feature (`~/.gemini/skills/expertise/`) - was personal tooling not available to other users
+- Domain expertise feature (`~/.claude/skills/expertise/`) - was personal tooling not available to other users
 
 ## [1.5.8] - 2025-01-15
 
@@ -506,7 +506,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ### Added
 - Parallel-first planning with dependency graphs
 - Checkpoint-resume capability for long-running phases
-- `.gemini/rules/` directory for auto-loaded contribution rules
+- `.claude/rules/` directory for auto-loaded contribution rules
 
 ### Changed
 - execute-phase uses wave-based blocking execution
@@ -607,7 +607,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.3.26] - 2026-01-06
 
 ### Added
-- Gemini CLI marketplace plugin support
+- Claude Code marketplace plugin support
 
 ### Fixed
 - Phase artifacts now committed when created
@@ -620,7 +620,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.3.24] - 2026-01-06
 
 ### Added
-- `GEMINI_CONFIG_DIR` environment variable support
+- `CLAUDE_CONFIG_DIR` environment variable support
 
 ## [1.3.23] - 2026-01-06
 
@@ -824,7 +824,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [1.2.0] - 2025-12-15
 
 ### Changed
-- Research workflow implemented as Gemini CLI context injection
+- Research workflow implemented as Claude Code context injection
 
 ## [1.1.2] - 2025-12-15
 

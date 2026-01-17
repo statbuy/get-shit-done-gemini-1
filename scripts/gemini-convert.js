@@ -198,7 +198,9 @@ function walk(dir) {
     } else if (entry.isFile()) {
        // Filter for text-based files we want to edit
        // Using RegExp constructor for safety
-       if (new RegExp("\\.(md|js|json|toml|txt|svg)$").test(entry.name) && !entry.name.includes('gemini-convert.js')) {
+       const isChangeLog = entry.name === 'CHANGELOG.md';
+       const isSelf = entry.name.includes('gemini-convert.js');
+       if (new RegExp("\\.(md|js|json|toml|txt|svg)$").test(entry.name) && !isSelf && !isChangeLog) {
          processFile(fullPath);
        }
     }
@@ -214,6 +216,31 @@ function updatePackageJson() {
 
     if (pkg.name !== 'get-shit-done-gemini') {
       pkg.name = 'get-shit-done-gemini';
+      changed = true;
+    }
+    if (pkg.author !== 'Cars10') {
+      pkg.author = 'Cars10';
+      pkg.contributors = ['TÂCHES (Original Author)'];
+      changed = true;
+    }
+    // Enforce fork repository URL
+    const forkUrl = 'git+https://github.com/Cars-10/get-shit-done-gemini.git';
+    if (!pkg.repository || pkg.repository.url !== forkUrl) {
+      pkg.repository = {
+        type: 'git',
+        url: forkUrl
+      };
+      changed = true;
+    }
+    // Enforce upstream field
+    const upstreamUrl = 'https://github.com/glittercowboy/get-shit-done.git';
+    if (pkg.upstream !== upstreamUrl) {
+      pkg.upstream = upstreamUrl;
+      changed = true;
+    }
+    // Ensure version has 'g' suffix
+    if (!pkg.version.endsWith('g')) {
+      pkg.version = pkg.version + 'g';
       changed = true;
     }
     if (pkg.bin && pkg.bin['get-shit-done-cc']) {
