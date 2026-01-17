@@ -25,8 +25,7 @@ ${cyan}   ██████╗ ███████╗██████╗
 
   Get Shit Done ${dim}v${pkg.version}${reset}
   A meta-prompting, context engineering and spec-driven
-  development system for Gemini CLI by /Cars10 which was
-  derived by the excellent work from TÂCHES.
+  development system for Gemini CLI by TÂCHES.
 `;
 
 // Parse args
@@ -142,7 +141,7 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix) {
     if (entry.isDirectory()) {
       copyWithPathReplacement(srcPath, destPath, pathPrefix);
     } else if (entry.name.endsWith('.md') || entry.name.endsWith('.toml')) {
-      // Replace ~/.gemini/ with the appropriate prefix in markdown and toml files
+      // Replace ~/.gemini/ with the appropriate prefix in markdown files
       let content = fs.readFileSync(srcPath, 'utf8');
       content = content.replace(/~\/\.gemini\//g, pathPrefix);
       fs.writeFileSync(destPath, content);
@@ -150,6 +149,96 @@ function copyWithPathReplacement(srcDir, destDir, pathPrefix) {
       fs.copyFileSync(srcPath, destPath);
     }
   }
+}
+
+/**
+ * Clean up orphaned files from previous GSD versions
+ */
+function cleanupOrphanedFiles(geminiDir) {
+  const orphanedFiles = [
+    'hooks/gsd-notify.sh',  // Removed in v1.6.x
+  ];
+
+  for (const relPath of orphanedFiles) {
+    const fullPath = path.join(geminiDir, relPath);
+    if (fs.existsSync(fullPath)) {
+      fs.unlinkSync(fullPath);
+      console.log(`  ${green}✓${reset} Removed orphaned ${relPath}`);
+    }
+  }
+}
+
+/**
+ * Clean up orphaned hook registrations from settings.json
+ */
+function cleanupOrphanedHooks(settings) {
+  const orphanedHookPatterns = [
+    'gsd-notify.sh',  // Removed in v1.6.x
+  ];
+
+  let cleaned = false;
+
+  // Check all hook event types (Stop, SessionStart, etc.)
+  if (settings.hooks) {
+    for (const eventType of Object.keys(settings.hooks)) {
+      const hookEntries = settings.hooks[eventType];
+      if (Array.isArray(hookEntries)) {
+        // Filter out entries that contain orphaned hooks
+        const filtered = hookEntries.filter(entry => {
+          if (entry.hooks && Array.isArray(entry.hooks)) {
+            // Check if any hook in this entry matches orphaned patterns
+            const hasOrphaned = entry.hooks.some(h =>
+              h.command && orphanedHookPatterns.some(pattern => h.command.includes(pattern))
+            );
+            if (hasOrphaned) {
+              cleaned = true;
+              return false;  // Remove this entry
+            }
+          }
+          return true;  // Keep this entry
+        });
+        settings.hooks[eventType] = filtered;
+      }
+    }
+  }
+
+  if (cleaned) {
+    console.log(`  ${green}✓${reset} Removed orphaned hook registrations`);
+  }
+
+  return settings;
+}
+
+/**
+ * Verify a directory exists and contains files
+ */
+function verifyInstalled(dirPath, description) {
+  if (!fs.existsSync(dirPath)) {
+    console.error(`  ${yellow}✗${reset} Failed to install ${description}: directory not created`);
+    return false;
+  }
+  try {
+    const entries = fs.readdirSync(dirPath);
+    if (entries.length === 0) {
+      console.error(`  ${yellow}✗${reset} Failed to install ${description}: directory is empty`);
+      return false;
+    }
+  } catch (e) {
+    console.error(`  ${yellow}✗${reset} Failed to install ${description}: ${e.message}`);
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Verify a file exists
+ */
+function verifyFileInstalled(filePath, description) {
+  if (!fs.existsSync(filePath)) {
+    console.error(`  ${yellow}✗${reset} Failed to install ${description}: file not created`);
+    return false;
+  }
+  return true;
 }
 
 /**
@@ -176,19 +265,11 @@ function install(isGlobal) {
 
   console.log(`  Installing to ${cyan}${locationLabel}${reset}\n`);
 
-  // Cleanup previous installation
-  const pathsToRemove = [
-    path.join(geminiDir, 'commands', 'gsd'),
-    path.join(geminiDir, 'get-shit-done'),
-    path.join(geminiDir, 'agents'),
-    path.join(geminiDir, 'rules')
-  ];
+  // Track installation failures
+  const failures = [];
 
-  for (const p of pathsToRemove) {
-    if (fs.existsSync(p)) {
-      fs.rmSync(p, { recursive: true, force: true });
-    }
-  }
+  // Clean up orphaned files from previous versions
+  cleanupOrphanedFiles(geminiDir);
 
   // Create commands directory
   const commandsDir = path.join(geminiDir, 'commands');
@@ -198,13 +279,21 @@ function install(isGlobal) {
   const gsdSrc = path.join(src, 'commands', 'gsd');
   const gsdDest = path.join(commandsDir, 'gsd');
   copyWithPathReplacement(gsdSrc, gsdDest, pathPrefix);
-  console.log(`  ${green}✓${reset} Installed commands/gsd`);
+  if (verifyInstalled(gsdDest, 'commands/gsd')) {
+    console.log(`  ${green}✓${reset} Installed commands/gsd`);
+  } else {
+    failures.push('commands/gsd');
+  }
 
   // Copy get-shit-done skill with path replacement
   const skillSrc = path.join(src, 'get-shit-done');
   const skillDest = path.join(geminiDir, 'get-shit-done');
   copyWithPathReplacement(skillSrc, skillDest, pathPrefix);
-  console.log(`  ${green}✓${reset} Installed get-shit-done`);
+  if (verifyInstalled(skillDest, 'get-shit-done')) {
+    console.log(`  ${green}✓${reset} Installed get-shit-done`);
+  } else {
+    failures.push('get-shit-done');
+  }
 
   // Copy agents to ~/.gemini/agents (subagents must be at root level)
   // Only delete gsd-*.md files to preserve user's custom agents
@@ -227,11 +316,15 @@ function install(isGlobal) {
     for (const entry of agentEntries) {
       if (entry.isFile() && entry.name.endsWith('.md')) {
         let content = fs.readFileSync(path.join(agentsSrc, entry.name), 'utf8');
-        content = content.replace(/~\/\.claude\//g, pathPrefix);
+        content = content.replace(/~\/\.gemini\//g, pathPrefix);
         fs.writeFileSync(path.join(agentsDest, entry.name), content);
       }
     }
-    console.log(`  ${green}✓${reset} Installed agents`);
+    if (verifyInstalled(agentsDest, 'agents')) {
+      console.log(`  ${green}✓${reset} Installed agents`);
+    } else {
+      failures.push('agents');
+    }
   }
 
   
@@ -248,13 +341,21 @@ function install(isGlobal) {
   const changelogDest = path.join(geminiDir, 'get-shit-done', 'CHANGELOG.md');
   if (fs.existsSync(changelogSrc)) {
     fs.copyFileSync(changelogSrc, changelogDest);
-    console.log(`  ${green}✓${reset} Installed CHANGELOG.md`);
+    if (verifyFileInstalled(changelogDest, 'CHANGELOG.md')) {
+      console.log(`  ${green}✓${reset} Installed CHANGELOG.md`);
+    } else {
+      failures.push('CHANGELOG.md');
+    }
   }
 
   // Write VERSION file for whats-new command
   const versionDest = path.join(geminiDir, 'get-shit-done', 'VERSION');
   fs.writeFileSync(versionDest, pkg.version);
-  console.log(`  ${green}✓${reset} Wrote VERSION (${pkg.version})`);
+  if (verifyFileInstalled(versionDest, 'VERSION')) {
+    console.log(`  ${green}✓${reset} Wrote VERSION (${pkg.version})`);
+  } else {
+    failures.push('VERSION');
+  }
 
   // Copy hooks
   const hooksSrc = path.join(src, 'hooks');
@@ -267,12 +368,23 @@ function install(isGlobal) {
       const destFile = path.join(hooksDest, entry);
       fs.copyFileSync(srcFile, destFile);
     }
-    console.log(`  ${green}✓${reset} Installed hooks`);
+    if (verifyInstalled(hooksDest, 'hooks')) {
+      console.log(`  ${green}✓${reset} Installed hooks`);
+    } else {
+      failures.push('hooks');
+    }
+  }
+
+  // If critical components failed, exit with error
+  if (failures.length > 0) {
+    console.error(`\n  ${yellow}Installation incomplete!${reset} Failed: ${failures.join(', ')}`);
+    console.error(`  Try running directly: node ~/.npm/_npx/*/node_modules/get-shit-done-gemini/bin/install.js --global\n`);
+    process.exit(1);
   }
 
   // Configure statusline and hooks in settings.json
   const settingsPath = path.join(geminiDir, 'settings.json');
-  const settings = readSettings(settingsPath);
+  const settings = cleanupOrphanedHooks(readSettings(settingsPath));
   const statuslineCommand = isGlobal
     ? 'node "$HOM./.gemini/hooks/statusline.js"'
     : 'node .gemini/hooks/statusline.js';
@@ -388,9 +500,35 @@ function handleStatusline(settings, isInteractive, callback) {
  * Prompt for install location
  */
 function promptLocation() {
+  // Check if stdin is a TTY - if not, fall back to global install
+  // This handles npx execution in environments like WSL2 where stdin may not be properly connected
+  if (!process.stdin.isTTY) {
+    console.log(`  ${yellow}Non-interactive terminal detected, defaulting to global install${reset}\n`);
+    const { settingsPath, settings, statuslineCommand } = install(true);
+    handleStatusline(settings, false, (shouldInstallStatusline) => {
+      finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline);
+    });
+    return;
+  }
+
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
+  });
+
+  // Track whether we've processed the answer to prevent double-execution
+  let answered = false;
+
+  // Handle readline close event to detect premature stdin closure
+  rl.on('close', () => {
+    if (!answered) {
+      answered = true;
+      console.log(`\n  ${yellow}Input stream closed, defaulting to global install${reset}\n`);
+      const { settingsPath, settings, statuslineCommand } = install(true);
+      handleStatusline(settings, false, (shouldInstallStatusline) => {
+        finishInstall(settingsPath, settings, statuslineCommand, shouldInstallStatusline);
+      });
+    }
   });
 
   const configDir = expandTilde(explicitConfigDir) || expandTilde(process.env.GEMINI_CONFIG_DIR);
@@ -404,6 +542,7 @@ function promptLocation() {
 `);
 
   rl.question(`  Choice ${dim}[1]${reset}: `, (answer) => {
+    answered = true;
     rl.close();
     const choice = answer.trim() || '1';
     const isGlobal = choice !== '2';

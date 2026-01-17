@@ -43,7 +43,7 @@ process.stdin.on('end', () => {
     // Current task from todos
     let task = '';
     const homeDir = os.homedir();
-    const todosDir = path.join(homeDir, '.claude', 'todos');
+    const todosDir = path.join(homeDir, '.gemini', 'todos');
     if (session && fs.existsSync(todosDir)) {
       const files = fs.readdirSync(todosDir)
         .filter(f => f.startsWith(session) && f.includes('-agent-') && f.endsWith('.json'))
@@ -61,7 +61,7 @@ process.stdin.on('end', () => {
 
     // GSD update available?
     let gsdUpdate = '';
-    const cacheFile = path.join(homeDir, '.claude', 'cache', 'gsd-update-check.json');
+    const cacheFile = path.join(homeDir, '.gemini', 'cache', 'gsd-update-check.json');
     if (fs.existsSync(cacheFile)) {
       try {
         const cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8'));

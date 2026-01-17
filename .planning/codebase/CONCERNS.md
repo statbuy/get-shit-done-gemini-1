@@ -11,7 +11,7 @@
 - Fix approach: Refactor to `fs.promises` if performance becomes an issue
 
 **Fragile Path Replacement:**
-- Issue: `bin/install.js` uses regex `/~\/\.claude\//g` to rewrite paths
+- Issue: `bin/install.js` uses regex `/~\/\.gemini\//g` to rewrite paths
 - Why: To support installation from local source vs global package
 - Impact: If path conventions change in the source, the installer may fail to rewrite correctly
 - Fix approach: Use more robust path normalization or a configuration-driven mapping

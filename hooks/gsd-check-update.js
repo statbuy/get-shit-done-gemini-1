@@ -8,9 +8,9 @@ const os = require('os');
 const { execSync, spawn } = require('child_process');
 
 const homeDir = os.homedir();
-const cacheDir = path.join(homeDir, '.claude', 'cache');
+const cacheDir = path.join(homeDir, '.gemini', 'cache');
 const cacheFile = path.join(cacheDir, 'gsd-update-check.json');
-const versionFile = path.join(homeDir, '.claude', 'get-shit-done', 'VERSION');
+const versionFile = path.join(homeDir, '.gemini', 'get-shit-done', 'VERSION');
 
 // Ensure cache directory exists
 if (!fs.existsSync(cacheDir)) {

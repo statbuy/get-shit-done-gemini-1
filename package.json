@@ -1,6 +1,6 @@
 {
   "name": "get-shit-done-gemini",
-  "version": "1.6.3-g",
+  "version": "1.6.4-g",
   "description": "A meta-prompting, context engineering and spec-driven development system for Gemini CLI by TÂCHES.",
   "bin": {
     "get-shit-done-gemini": "bin/install.js"
@@ -13,24 +13,24 @@
     "hooks"
   ],
   "keywords": [
-    "gemini",
-    "gemini-cli",
     "ai",
     "meta-prompting",
     "context-engineering",
-    "spec-driven-development"
+    "spec-driven-development",
+    "gemini",
+    "gemini-cli"
   ],
   "author": "Cars10",
-  "contributors": [
-    "TÂCHES (Original Author)"
-  ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Cars-10/get-shit-done-gemini.git"
   },
-  "upstream": "https://github.com/glittercowboy/get-shit-done.git",
   "engines": {
     "node": ">=16.7.0"
-  }
+  },
+  "contributors": [
+    "TÂCHES (Original Author)"
+  ],
+  "upstream": "https://github.com/glittercowboy/get-shit-done.git"
 }

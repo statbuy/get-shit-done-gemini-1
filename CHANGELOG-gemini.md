@@ -1,6 +1,6 @@
 # Gemini Conversion & Fork Maintenance
 
-This document outlines the automated conversion process used to maintain the **Get Shit Done (GSD)** system for the Gemini CLI, derived from the original [Claude-based repository](https://github.com/glittercowboy/get-shit-done).
+This document outlines the automated conversion process used to maintain the **Get Shit Done (GSD)** system for the Gemini CLI, derived from the original [Gemini-based repository](https://github.com/glittercowboy/get-shit-done).
 
 ## Overview
 
@@ -27,14 +27,14 @@ node scripts/gemini-convert.js
 The script performs four key operations:
 
 1.  **Normalization of Directory Structure**
-    - Moves `.claude/` directories to `.gemini/`.
+    - Moves `.gemini/` directories to `.gemini/`.
     - Moves rule files from `.gemini/rules/` to the project root `rules/` (required for distribution).
     - Moves command definition files (`.toml`) to `commands/gsd/`.
 
 2.  **Branding & Content Replacement**
     - Scans all text files (`.md`, `.js`, `.json`, etc.).
-    - Replaces instances of "Claude" with "Gemini".
-    - Updates configuration paths (e.g., `~/.claude` to `~/.gemini`).
+    - Replaces instances of "Gemini" with "Gemini".
+    - Updates configuration paths (e.g., `~/.gemini` to `~/.gemini`).
     - Updates CLI command references (e.g., `claude` to `gemini`).
 
 3.  **TOML Configuration Generation**
