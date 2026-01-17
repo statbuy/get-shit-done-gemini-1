@@ -48,12 +48,12 @@ The script performs four key operations:
     - **Contributors:** Adds `TÂCHES (Original Author)` to contributors.
     - **Repository:** Sets the URL to the fork: `https://github.com/Cars-10/get-shit-done-gemini.git`.
     - **Upstream:** Adds a reference to the original repo: `https://github.com/glittercowboy/get-shit-done.git`.
-    - **Version:** Appends a `g` suffix (e.g., `1.6.3g`) to the version number to denote the Gemini fork.
+    - **Version:** Appends a `-g` suffix (e.g., `1.6.3-g`) to the version number to denote the Gemini fork.
 
 ## Fork Policy
 
 To ensure transparency and traceability:
 
-- **Version Numbers:** We match the upstream major.minor.patch version but append `g` (e.g., `1.6.3` -> `1.6.3g`).
+- **Version Numbers:** We match the upstream major.minor.patch version but append `-g` (e.g., `1.6.3` -> `1.6.3-g`).
 - **Credit:** The original author (TÂCHES) is always listed in the `contributors` field.
 - **Upstream Link:** The `package.json` maintains a link to the original repository.

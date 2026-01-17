@@ -238,9 +238,14 @@ function updatePackageJson() {
       pkg.upstream = upstreamUrl;
       changed = true;
     }
-    // Ensure version has 'g' suffix
-    if (!pkg.version.endsWith('g')) {
-      pkg.version = pkg.version + 'g';
+    // Ensure version has '-g' suffix
+    if (!pkg.version.endsWith('-g')) {
+      if (pkg.version.endsWith('g')) {
+        // Fix old format (1.6.3g -> 1.6.3-g)
+        pkg.version = pkg.version.slice(0, -1) + '-g';
+      } else {
+        pkg.version = pkg.version + '-g';
+      }
       changed = true;
     }
     if (pkg.bin && pkg.bin['get-shit-done-cc']) {
