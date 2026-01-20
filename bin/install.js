@@ -362,7 +362,7 @@ function promptLocation() {
   const globalPath = configDir || path.join(os.homedir(), '.gemini');
   const globalLabel = globalPath.replace(os.homedir(), '~');
 
-  console.log(`  ${yellow}Where would you like to install?${reset}
+  console.log(`  ${yellow}Where would you like to install v${pkg.version}?${reset}
 
   ${cyan}1${reset}) Global ${dim}(${globalLabel})${reset} - available in all projects
   ${cyan}2${reset}) Local  ${dim}(./.gemini)${reset} - this project only
