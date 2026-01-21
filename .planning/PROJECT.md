@@ -10,6 +10,10 @@ Restore real-time codebase intelligence and leverage Gemini's massive context to
 
 ## Context
 
+Shipped v1.9.0 with standalone watcher, SQLite graph database, and subagent architecture.
+System now supports visual verification and self-healing conventions.
+Tech stack: Node.js, SQLite (sql.js), Gemini 1.5 Pro.
+
 ### Why
 - The current Gemini fork is "static" because it lacks the background hooks of the Claude CLI.
 - Gemini's massive context window (1M+ tokens) is currently underutilized by GSD's "small-batch" planning logic.
@@ -27,13 +31,22 @@ Restore real-time codebase intelligence and leverage Gemini's massive context to
 - ✓ Slash Command Integration — custom commands registered and functional
 - ✓ Spec-Driven Development — plan -> execute -> verify workflow
 - ✓ Multi-Agent Orchestration — parallel sub-agents for research and planning
+- ✓ **WATCHER-01**: Watcher Daemon (`npm run gsd-watch`)
+- ✓ **INTEL-01**: SQLite-backed codebase graph (exports, imports, dependencies)
+- ✓ **INTEL-02**: Auto-indexing of JS/TS
+- ✓ **CONTEXT-01**: Big Context Refactor — distinct Reasoning vs. Reference tiers
+- ✓ **CONTEXT-02**: Auto-ingestion
+- ✓ **INTEL-03**: Semantic Purpose descriptions
+- ✓ **UAT-01**: Multimodal Verification — `checkpoint:visual-verify`
+- ✓ **UAT-02**: Visual comparison logic
+- ✓ **HEAL-01**: Self-Healing Conventions
+- ✓ **INTEL-08**: Delegated Entity Generation
+- ✓ **INTEL-09**: Subagent Direct Write
+- ✓ **INTEL-10**: Path-only Context
 
 ### Active
-- [ ] **WATCHER-01**: Watcher Daemon (`npm run gsd-watch`) for real-time file indexing
-- [ ] **INTEL-01**: SQLite-backed codebase graph (exports, imports, dependencies) using `sql.js`
-- [ ] **CONTEXT-01**: Big Context Refactor — distinct Reasoning vs. Reference tiers in prompts
-- [ ] **UAT-01**: Multimodal Verification — `checkpoint:visual-verify` using screenshots
-- [ ] **HEAL-01**: Self-Healing Conventions — retrospective agents updating style guides
+
+(None — start next milestone)
 
 ### Out of Scope
 - Native Gemini CLI hooks — until Google provides an official plugin/hook API.
@@ -43,9 +56,9 @@ Restore real-time codebase intelligence and leverage Gemini's massive context to
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Standalone Watcher | Restores auto-indexing without needing native CLI hooks. | — Pending |
-| SQLite (sql.js) | High-performance graph queries while remaining portable. | — Pending |
-| Reference Context Tier | Uses Gemini's 1M token window to prevent hallucinations of internal APIs. | — Pending |
+| Standalone Watcher | Restores auto-indexing without needing native CLI hooks. | ✓ Shipped v1.9.0 |
+| SQLite (sql.js) | High-performance graph queries while remaining portable. | ✓ Shipped v1.9.0 |
+| Reference Context Tier | Uses Gemini's 1M token window to prevent hallucinations of internal APIs. | ✓ Shipped v1.9.0 |
 
 ## Last Updated
-*Last updated: 2026-01-20 after initialization*
+*Last updated: 2026-01-21 after v1.9.0 milestone*
