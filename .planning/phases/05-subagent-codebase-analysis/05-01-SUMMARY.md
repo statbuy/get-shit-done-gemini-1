@@ -1,122 +1,94 @@
 ---
 phase: 05-subagent-codebase-analysis
-plan: 01
-title: gsd-entity-generator Agent Definition
-subsystem: agents
-tags: [subagent, entity-generation, semantic-analysis]
-
-dependency-graph:
-  requires:
-    - 04-03 (entity generation instructions)
-    - gsd-codebase-mapper.md (pattern reference)
-  provides:
-    - gsd-entity-generator subagent definition
-    - Entity template specification
-    - Type heuristics table
-  affects:
-    - 05-02 (analyze-codebase integration)
-    - Future entity generation workflows
-
+plan: 05-01
+subsystem: infra
+tags: [child_process, sql.js, sqlite, ipc]
+requires: []
+provides:
+  - Subagent host infrastructure
+  - Subagent guest wrapper
+  - DB persistence logic
+affects: [05-02, 05-03]
 tech-stack:
   added: []
-  patterns:
-    - Subagent direct-write pattern
-    - Statistics-only return pattern
-    - Wiki-link dependency notation
-
+  patterns: [Hot Potato DB handoff, JSON Lines logging]
 key-files:
   created:
-    - agents/gsd-entity-generator.md
+    - lib/intel/subagent-host.js
+    - lib/intel/subagent-guest.js
+    - agents/indexer.js
+    - tests/intel/subagent.test.js
   modified: []
-
-decisions:
-  - id: skip-existing-entities
-    choice: Check for existing entity file before writing
-    rationale: Prevents overwriting manual edits to entities
-
-metrics:
-  duration: 1 min 13 sec
-  completed: 2026-01-20
+key-decisions:
+  - "Use sql.js export/import for DB state handoff between processes"
+  - "Use separate log files for subagent IPC/debugging"
+patterns-established:
+  - "Subagent Pattern: Host exports DB -> Spawns Child -> Child imports DB -> Child exports DB -> Host reloads DB"
+duration: 10min
+completed: 2026-01-21
 ---
 
-# Phase 05 Plan 01: gsd-entity-generator Agent Definition Summary
+# Phase 05 Plan 01: Subagent Infrastructure Summary
 
-**One-liner:** Subagent definition for semantic entity generation with direct disk writes and statistics-only returns.
+**Implemented `runSubagent` and `startSubagent` infrastructure with `sql.js` disk persistence and crash recovery.**
 
-## What Was Built
+## Performance
 
-Created `agents/gsd-entity-generator.md` following the established `gsd-codebase-mapper.md` pattern:
+- **Duration:** 10 min
+- **Started:** 2026-01-21
+- **Completed:** 2026-01-21
+- **Tasks:** 4
+- **Files modified:** 4
 
-**Agent structure:**
-- Frontmatter with name, description, tools (Read, Write, Bash), color
-- Role section explaining spawn context from `/gsd:analyze-codebase`
-- `<why_this_matters>` section explaining how entities feed the intelligence system
-- 3-step process: parse_file_list, process_each_file, return_statistics
+## Accomplishments
+- Implemented `runSubagent` (Host) to manage `sql.js` export/import cycle.
+- Implemented `startSubagent` (Guest) to standardize subagent lifecycle and logging.
+- Created `agents/indexer.js` as a proof-of-concept subagent.
+- Verified robust crash recovery and data persistence via `tests/intel/subagent.test.js`.
 
-**Entity template specification:**
-- YAML frontmatter: path, type, updated, status
-- Sections: Purpose, Exports, Dependencies, Used By, Notes
-- Internal dependencies use [[wiki-links]] for graph edge creation
-- External dependencies as plain text
+## Task Commits
 
-**Type heuristics table:**
-| Type | Indicators |
-|------|-----------|
-| api | api/, routes/, endpoints/ |
-| component | components/, React/Vue exports |
-| util | utils/, lib/, helpers/ |
-| config | config/, *.config.* |
-| hook | hooks/, use* functions |
-| service | services/ |
-| model | models/, types/ |
-| test | *.test.*, *.spec.* |
-| module | default |
+Each task was committed atomically:
 
-**Wiki-link rules:**
-- Internal (starts with `.` or `@/`) -> convert to slug, wrap in [[brackets]]
-- External (package name) -> plain text, no brackets
+1. **Task 1: Create host controller** - `6215df0` (feat)
+2. **Task 2: Create guest wrapper** - `9cb3253` (feat)
+3. **Task 3: Create stub indexer** - `7cd1fc4` (feat)
+4. **Task 4: Verify with tests** - `7ca0f9e` (test)
 
-**Critical rules matching gsd-codebase-mapper:**
-- WRITE entities directly (never return contents)
-- PostToolUse hook syncs to graph.db automatically
-- Use EXACT template format (hook parses frontmatter + [[links]])
-- Skip existing entities (don't overwrite)
-- Return statistics only (~10 lines)
+**Plan metadata:** (pending)
 
-## Tasks Completed
+## Files Created/Modified
+- `lib/intel/subagent-host.js` - Orchestrates subagent spawning and DB handoff.
+- `lib/intel/subagent-guest.js` - Wrapper for subagent scripts.
+- `agents/indexer.js` - Example subagent script.
+- `tests/intel/subagent.test.js` - Verification suite.
 
-| Task | Name | Commit | Key Files |
-|------|------|--------|-----------|
-| 1 | Create gsd-entity-generator agent definition | f4c5817 | agents/gsd-entity-generator.md |
+## Decisions Made
+- **Hot Potato DB Handoff:** Since `sql.js` is in-memory, we must serialize to disk before spawning a child and reload after it exits to maintain state consistency without complex shared memory or main-thread blocking.
 
 ## Deviations from Plan
 
-None - plan executed exactly as written.
+### Auto-fixed Issues
 
-## Decisions Made
+**1. [Rule 3 - Blocking] Fixed relative path in test crasher script**
+- **Found during:** Task 4 (Verification)
+- **Issue:** The dynamically generated crasher script inside `tests/intel/tmp_subagent_test/` was trying to require `../../lib/intel/subagent-guest` which resolved incorrectly.
+- **Fix:** Updated require path to `../../../lib/intel/subagent-guest`.
+- **Files modified:** `tests/intel/subagent.test.js`
+- **Verification:** Test passed after fix.
+- **Committed in:** `7ca0f9e`
 
-1. **Skip existing entities by default**
-   - Prevents accidental overwrite of manually edited entities
-   - Aligns with research recommendation in 05-RESEARCH.md
-   - Agent checks `ls .planning/intel/entities/{slug}.md` before writing
+---
 
-## Verification Results
+**Total deviations:** 1 auto-fixed (Blocking)
+**Impact on plan:** None, purely test infrastructure fix.
 
-- [x] File exists at `agents/gsd-entity-generator.md`
-- [x] Frontmatter valid YAML (name, description, tools, color)
-- [x] Role section explains subagent purpose
-- [x] Process has 3 steps: parse, process, return
-- [x] Entity template included in full
-- [x] Type heuristics table present
-- [x] Wiki-link rules specified
-- [x] Critical rules section matches gsd-codebase-mapper style
-- [x] Returns statistics only (not entity contents)
+## Issues Encountered
+None.
+
+## User Setup Required
+None.
 
 ## Next Phase Readiness
-
-**Prerequisites for 05-02:**
-- [x] gsd-entity-generator.md exists
-- [x] Agent follows expected patterns (direct write, stats return)
-- [x] Entity template matches what PostToolUse hook expects
-
-**Ready for:** Integration into `/gsd:analyze-codebase` command (Plan 05-02)
+- Ready for Plan 05-02 (Delegated Entity Generation).
+- Infrastructure is verified and stable.
