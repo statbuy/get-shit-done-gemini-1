@@ -1,0 +1,11 @@
+{
+  "mode": "yolo",
+  "depth": "standard",
+  "parallelization": {
+    "enabled": true
+  },
+  "planning": {
+    "commit_docs": true
+  },
+  "model_profile": "balanced"
+}
