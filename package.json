@@ -38,12 +38,13 @@
     "TÂCHES (Original Author)"
   ],
   "upstream": "https://github.com/glittercowboy/get-shit-done.git",
-  "dependencies": {},
   "devDependencies": {
+    "chokidar": "^5.0.0",
     "esbuild": "^0.24.0",
     "sql.js": "^1.12.0"
   },
   "scripts": {
+    "gsd-watch": "node bin/gsd-watch.js",
     "build:hooks": "node scripts/build-hooks.js",
     "prepublishOnly": "npm run build:hooks"
   }
