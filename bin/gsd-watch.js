@@ -91,21 +91,25 @@ async function start() {
   // Watcher
   const watcher = chokidar.watch('.', {
     ignored: [
-      /(^|[\\/])\..*/, // dotfiles
+      /(^|[\/\\])\../, // dotfiles
       '**/node_modules/**',
       '**/dist/**',
       '**/.planning/**',
       '**/.gemini/**'
     ],
     persistent: true,
-    ignoreInitial: true // Lazy mode
+    ignoreInitial: false // Scan on start
   });
 
   watcher.on('add', path => processFile(path, db, saveDb));
   watcher.on('change', path => processFile(path, db, saveDb));
   watcher.on('unlink', path => removeFile(path, db, saveDb));
+  watcher.on('error', error => log(`Watcher error: ${error}`));
 
   log('Watching for changes...');
+
+  // Keep process alive
+  setInterval(() => {}, 1 << 30);
 
   process.on('SIGINT', cleanup);
   process.on('SIGTERM', cleanup);
