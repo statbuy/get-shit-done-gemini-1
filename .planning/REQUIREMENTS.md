@@ -5,6 +5,9 @@
 - [x] **INTEL-01**: SQLite graph schema (`nodes`, `edges`) implemented via `sql.js` (WASM) for portable graph storage.
 - [x] **INTEL-02**: Automatic indexing of JS/TS exports and imports on file save to keep the graph current.
 - [x] **INTEL-03**: Incremental "Semantic Purpose" generation for new files using sub-agents.
+- [x] **INTEL-08**: Delegated Entity Generation (Subagent analysis).
+- [x] **INTEL-09**: Subagent Direct Write (Graph persistence).
+- [x] **INTEL-10**: Path-only Context (Graph metadata usage).
 
 ### Prompt Engineering
 - [x] **CONTEXT-01**: Implementation of "Reference Tiers" in the `gsd-planner` to utilize Gemini's massive context window.
