@@ -88,6 +88,21 @@ async function start() {
     log('Graph saved to disk.');
   }, 1000);
 
+  // Batch Processing
+  const processQueue = new Set();
+  const processBatch = debounce(() => {
+    const files = [...processQueue];
+    processQueue.clear();
+    log(`Batch processing ${files.length} files...`);
+    for (const file of files) {
+      if (fs.existsSync(file)) {
+        processFile(file, db, saveDb);
+      } else {
+        removeFile(file, db, saveDb);
+      }
+    }
+  }, 1000);
+
   // Watcher
   const watcher = chokidar.watch('.', {
     ignored: [
@@ -101,9 +116,9 @@ async function start() {
     ignoreInitial: false // Scan on start
   });
 
-  watcher.on('add', path => processFile(path, db, saveDb));
-  watcher.on('change', path => processFile(path, db, saveDb));
-  watcher.on('unlink', path => removeFile(path, db, saveDb));
+  watcher.on('add', path => { processQueue.add(path); processBatch(); });
+  watcher.on('change', path => { processQueue.add(path); processBatch(); });
+  watcher.on('unlink', path => { processQueue.add(path); processBatch(); });
   watcher.on('error', error => log(`Watcher error: ${error}`));
 
   log('Watching for changes...');
