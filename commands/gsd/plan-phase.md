@@ -250,7 +250,13 @@ VERIFICATION_CONTENT=$(cat "${PHASE_DIR}"/*-VERIFICATION.md 2>/dev/null)
 UAT_CONTENT=$(cat "${PHASE_DIR}"/*-UAT.md 2>/dev/null)
 
 # Codebase intelligence (if exists)
-INTEL_CONTENT=$(cat .planning/intel/summary.md 2>/dev/null)
+INTEL_SUMMARY=$(cat .planning/intel/summary.md 2>/dev/null)
+INTEL_HOTSPOTS=$(node bin/gsd-context.js --hotspots 2>/dev/null)
+
+INTEL_CONTENT="${INTEL_SUMMARY}
+
+## Hotspots Reference Context
+${INTEL_HOTSPOTS}"
 ```
 
 ## 8. Spawn gsd-planner Agent
