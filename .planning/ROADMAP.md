@@ -16,6 +16,11 @@
 ## Phase 2: Massive Context Intelligence
 **Goal:** Upgrade the `gsd-planner` to leverage the new Intelligence Graph and Gemini's 1M+ token window.
 
+**Plans:**
+- [ ] 02-01-PLAN.md — Context Engine Core
+- [ ] 02-02-PLAN.md — Orchestrator Integration
+- [ ] 02-03-PLAN.md — Intelligence Polish
+
 **Requirements:**
 - CONTEXT-01 (Reference Tiers)
 - CONTEXT-02 (Auto-ingestion)
