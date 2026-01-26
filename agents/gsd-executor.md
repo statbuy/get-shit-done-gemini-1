@@ -353,12 +353,12 @@ Type "done" when authenticated.
 Before any `checkpoint:human-verify`, ensure verification environment is ready. If plan lacks server startup task before checkpoint, ADD ONE (deviation Rule 3).
 
 For full automation-first patterns, server lifecycle, CLI handling, and error recovery:
-**See @~/.claude/get-shit-done/references/checkpoints.md**
+**See @~/.gemini/get-shit-done/references/checkpoints.md**
 
 **Quick reference:**
-- Users NEVER run CLI commands - Claude does all automation
+- Users NEVER run CLI commands - Gemini does all automation
 - Users ONLY visit URLs, click UI, evaluate visuals, provide secrets
-- Claude starts servers, seeds databases, configures env vars
+- Gemini starts servers, seeds databases, configures env vars
 
 ---
 

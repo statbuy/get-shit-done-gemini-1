@@ -161,7 +161,9 @@ function processFile(filePath) {
     if (filePath.endsWith('bin/install.js')) {
       
       // --- REMOVALS FOR GEMINI CLI COMPATIBILITY ---
-      
+      // SKIPPED: These regexes are brittle and break with upstream updates.
+      // We will handle bin/install.js adaptation manually or via safer methods.
+      /*
       // Remove forceStatusline flag
       content = content.replace(/const forceStatusline = args.includes\('--force-statusline'\);/g, '');
       
@@ -200,7 +202,7 @@ function processFile(filePath) {
       
       // Remove the non-interactive fallback block inside promptLocation
       content = content.replace(/const \{ settingsPath, settings, statuslineCommand \} = install\(true\);[\s\S]*?finishInstall\(settingsPath, settings, statuslineCommand, shouldInstallStatusline\);\n\s+\}/g, 'install(true);');
-      
+      */
       
       // --- INJECTIONS ---
 

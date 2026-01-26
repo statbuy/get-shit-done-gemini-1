@@ -6,7 +6,7 @@ Execute a phase prompt (PLAN.md) and create the outcome summary (SUMMARY.md).
 Read STATE.md before any operation to load project context.
 Read config.json for planning behavior settings.
 
-@~/.claude/get-shit-done/references/git-integration.md
+@~/.gemini/get-shit-done/references/git-integration.md
 </required_reading>
 
 <process>
@@ -958,7 +958,7 @@ After TDD plan completion, ensure:
 - Standard plans: Multiple tasks, 1 commit per task, 2-4 commits total
 - TDD plans: Single feature, 2-3 commits for RED/GREEN/REFACTOR cycle
 
-See `~/.claude/get-shit-done/references/tdd.md` for TDD plan structure.
+See `~/.gemini/get-shit-done/references/tdd.md` for TDD plan structure.
 </tdd_plan_execution>
 
 <task_commit>
@@ -1050,7 +1050,7 @@ TASK_COMMITS+=("Task ${TASK_NUM}: ${TASK_COMMIT}")
 <step name="checkpoint_protocol">
 When encountering `type="checkpoint:*"`:
 
-**Critical: Claude automates everything with CLI/API before checkpoints.** Checkpoints are for verification and decisions, not manual work.
+**Critical: Gemini automates everything with CLI/API before checkpoints.** Checkpoints are for verification and decisions, not manual work.
 
 **Display checkpoint clearly:**
 
@@ -1106,7 +1106,7 @@ Options:
 **For checkpoint:human-action (1% - rare, only for truly unavoidable manual steps):**
 
 ```
-I automated: [what Claude already did via CLI/API]
+I automated: [what Gemini already did via CLI/API]
 
 Need your help with: [the ONE thing with no CLI/API - email link, 2FA code]
 
@@ -1126,7 +1126,7 @@ I'll verify after: [verification]
 - If verification passes or N/A: continue to next task
 - If verification fails: inform user, wait for resolution
 
-See ~/.claude/get-shit-done/references/checkpoints.md for complete checkpoint guidance.
+See ~/.gemini/get-shit-done/references/checkpoints.md for complete checkpoint guidance.
 </step>
 
 <step name="checkpoint_return_for_orchestrator">
@@ -1260,7 +1260,7 @@ grep -A 50 "^user_setup:" .planning/phases/XX-name/{phase}-{plan}-PLAN.md | head
 
 **If user_setup exists and is not empty:**
 
-Create `.planning/phases/XX-name/{phase}-USER-SETUP.md` using template from `~/.claude/get-shit-done/templates/user-setup.md`.
+Create `.planning/phases/XX-name/{phase}-USER-SETUP.md` using template from `~/.gemini/get-shit-done/templates/user-setup.md`.
 
 **Content generation:**
 
@@ -1321,7 +1321,7 @@ Set `USER_SETUP_CREATED=true` if file was generated, for use in completion messa
 
 <step name="create_summary">
 Create `{phase}-{plan}-SUMMARY.md` as specified in the prompt's `<output>` section.
-Use ~/.claude/get-shit-done/templates/summary.md for structure.
+Use ~/.gemini/get-shit-done/templates/summary.md for structure.
 
 **File location:** `.planning/phases/XX-name/{phase}-{plan}-SUMMARY.md`
 
@@ -1716,7 +1716,7 @@ Summary: .planning/phases/{phase-dir}/{phase}-{plan}-SUMMARY.md
 
 `/gsd:execute-phase {phase}`
 
-<sub>`/clear` first → fresh context window</sub>
+`/clear` first → fresh context window
 
 ---
 
@@ -1777,7 +1777,7 @@ All {Y} plans finished.
 
 `/gsd:plan-phase {Z+1}`
 
-<sub>`/clear` first → fresh context window</sub>
+`/clear` first → fresh context window
 
 ---
 
@@ -1815,7 +1815,7 @@ All {Y} plans finished.
 
 `/gsd:complete-milestone`
 
-<sub>`/clear` first → fresh context window</sub>
+`/clear` first → fresh context window
 
 ---
 

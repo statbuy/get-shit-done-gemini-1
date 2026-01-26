@@ -1,9 +1,9 @@
 {
-  "name": "get-shit-done-cc",
-  "version": "1.9.13",
-  "description": "A meta-prompting, context engineering and spec-driven development system for Claude Code by TÂCHES.",
+  "name": "get-shit-done-gemini",
+  "version": "1.9.13-g-ultra",
+  "description": "A meta-prompting, context engineering and spec-driven development system for Gemini CLI by TÂCHES.",
   "bin": {
-    "get-shit-done-cc": "bin/install.js"
+    "get-shit-done-gemini": "bin/install.js"
   },
   "files": [
     "bin",
@@ -14,18 +14,18 @@
     "scripts"
   ],
   "keywords": [
-    "claude",
-    "claude-code",
     "ai",
     "meta-prompting",
     "context-engineering",
-    "spec-driven-development"
+    "spec-driven-development",
+    "gemini",
+    "gemini-cli"
   ],
-  "author": "TÂCHES",
+  "author": "Cars10",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/glittercowboy/get-shit-done.git"
+    "url": "git+https://github.com/Cars-10/get-shit-done-gemini.git"
   },
   "homepage": "https://github.com/glittercowboy/get-shit-done",
   "bugs": {
@@ -41,5 +41,9 @@
   "scripts": {
     "build:hooks": "node scripts/build-hooks.js",
     "prepublishOnly": "npm run build:hooks"
-  }
+  },
+  "contributors": [
+    "TÂCHES (Original Author)"
+  ],
+  "upstream": "https://github.com/glittercowboy/get-shit-done.git"
 }
