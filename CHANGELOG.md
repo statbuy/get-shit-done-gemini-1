@@ -6,6 +6,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [1.9.13-g] - 2026-01-26
+
+### Changed
+- Synced with upstream version 1.9.13
+- Restored and adapted `gsd-check-update` and `gsd-statusline` hooks for Gemini
+- Reverted version suffix to `-g`
+
 ## [1.9.12] - 2025-01-23
 
 ### Removed
