@@ -15,7 +15,7 @@
 <br>
 
 ```bash
-npx get-shit-done-gemini
+npx github:statbuy/get-shit-done-gemini-1
 ```
 
 **Works on Mac, Windows, and Linux.**
