@@ -17,6 +17,7 @@
 ```bash
 npx github:statbuy/get-shit-done-gemini-1
 ```
+for somereason there were already repo like this but it was took down, use gemini cli its good and less money, claude code usage limits and pricing are insane, keep using it means they will keep doing it...
 
 **Works on Mac, Windows, and Linux.**
 
