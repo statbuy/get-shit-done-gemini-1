@@ -73,7 +73,7 @@ People who want to describe what they want and have it built correctly — witho
 ## Getting Started
 
 ```bash
-npx get-shit-done-gemini
+npx github:statbuy/get-shit-done-gemini-1
 ```
 
 The installer prompts you to choose:
@@ -87,7 +87,7 @@ Verify with `/gsd:help` inside your Gemini CLI or OpenCode interface.
 GSD evolves fast. Update periodically:
 
 ```bash
-npx get-shit-done-gemini@latest
+npx github:statbuy/get-shit-done-gemini-1
 ```
 
 <details>
